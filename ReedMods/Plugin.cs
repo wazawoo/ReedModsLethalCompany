@@ -2,11 +2,9 @@
 using BepInEx.Logging;
 using HarmonyLib;
 using ReedMods.Patches;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using System.Reflection;
+using UnityEngine;
 
 namespace ReedMods
 {
@@ -26,6 +24,11 @@ namespace ReedMods
 
         internal ManualLogSource logSource;
 
+        // Assets
+        public static AssetBundle ReedModsAssets;
+
+        internal static AudioClip[]? shovelSFX;
+
         void Awake() 
         { 
             if (Instance == null)
@@ -34,11 +37,27 @@ namespace ReedMods
             }
 
             logSource = BepInEx.Logging.Logger.CreateLogSource(modGUID);
-
             logSource.LogInfo("ReedMods woke up");
-
             harmony.PatchAll(typeof(ReedModsBase));
+
+            // player controller patch
             harmony.PatchAll(typeof(PlayerControllerBPatch));
+
+            // load asset bundle
+            string sAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            ReedModsAssets = AssetBundle.LoadFromFile(Path.Combine(sAssemblyLocation, "reedmodsassets"));
+            if (ReedModsAssets == null)
+            {
+                logSource.LogError("Failed to load reedmodsassets assets.");
+                return;
+            }
+
+            // loading shovel sfx
+            shovelSFX = ReedModsAssets.LoadAssetWithSubAssets<AudioClip>("Assets/boing.mp3");
+            harmony.PatchAll(typeof(ShovelSoundsPatch));
+
+            logSource.LogInfo("ReedMods finished loading");
         }
     }
 }
