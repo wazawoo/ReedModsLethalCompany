@@ -1,0 +1,9 @@
+{
+    "name": "ReedMods",
+    "version_number": "1.0.0",
+    "website_url": "https://reeddoesstuff.com",
+    "description": "infinite sprint, keep one scrap type when everyone dies, shovel boing sound",
+    "dependencies": [
+        "BepInEx-BepInExPack-5.4.2100"
+    ]
+}

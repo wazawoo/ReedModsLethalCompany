@@ -2,6 +2,7 @@
 using BepInEx.Logging;
 using HarmonyLib;
 using ReedMods.Patches;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
@@ -19,15 +20,18 @@ namespace ReedMods
 
         private readonly Harmony harmony = new Harmony(modGUID);
 
-        // singleton
-        private static ReedModsBase Instance;
-
+        // singleton, log source
+        internal static ReedModsBase Instance;
         internal ManualLogSource logSource;
 
         // Assets
         public static AssetBundle ReedModsAssets;
-
         internal static AudioClip[]? shovelSFX;
+
+        // KeepSomeItems
+        internal bool allPlayersDeadPreviously;
+
+        internal List<int> scrapIDsToKeep = new();
 
         void Awake() 
         { 
@@ -40,10 +44,15 @@ namespace ReedMods
             logSource.LogInfo("ReedMods woke up");
             harmony.PatchAll(typeof(ReedModsBase));
 
-            // player controller patch
-            harmony.PatchAll(typeof(PlayerControllerBPatch));
+            // START
 
-            // load asset bundle
+            // infinite sprint
+            harmony.PatchAll(typeof(InfiniteSprintPatch));
+
+            // keep some items
+            harmony.PatchAll(typeof(KeepSomeItemsPatch));
+
+            // load asset bundle (could add more custom assets into this via the Unity project)
             string sAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             ReedModsAssets = AssetBundle.LoadFromFile(Path.Combine(sAssemblyLocation, "reedmodsassets"));
@@ -53,9 +62,11 @@ namespace ReedMods
                 return;
             }
 
-            // loading shovel sfx
+            // loading shovel boing sfx
             shovelSFX = ReedModsAssets.LoadAssetWithSubAssets<AudioClip>("Assets/boing.mp3");
             harmony.PatchAll(typeof(ShovelSoundsPatch));
+
+            // DONE
 
             logSource.LogInfo("ReedMods finished loading");
         }

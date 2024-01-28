@@ -49,6 +49,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Unity.Netcode.Runtime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
@@ -65,10 +69,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Patches\PlayerControllerBPatch.cs" />
+    <Compile Include="Patches\KeepSomeItemsPatch.cs" />
+    <Compile Include="Patches\InfiniteSprintPatch.cs" />
     <Compile Include="Patches\ShovelSoundsPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(TargetName).dll" "..\..\..\zip_these\$(TargetName).dll";
+
+if exist "..\..\..\$(AssemblyName).zip" (  Del "..\..\..\$(AssemblyName).zip");
+
+powershell.exe -command Compress-Archive -Path "..\..\..\zip_these\$(AssemblyName).dll", "..\..\..\zip_these\manifest.json", "..\..\..\zip_these\icon.png", "..\..\..\zip_these\reedmodsassets", "..\..\..\zip_these\README.md" -DestinationPath "..\..\..\$(AssemblyName).zip";</PostBuildEvent>
+  </PropertyGroup>
 </Project>
