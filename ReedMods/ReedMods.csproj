@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\AppData\Roaming\Thunderstore Mod Manager\DataFolder\LethalCompany\profiles\dev\BepInEx\core\0Harmony.dll</HintPath>
@@ -78,6 +81,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy "$(TargetName).dll" "..\..\..\zip_these\$(TargetName).dll";
+copy "..\..\..\README.md" "..\..\..\zip_these\README.md";
 
 if exist "..\..\..\$(AssemblyName).zip" (  Del "..\..\..\$(AssemblyName).zip");
 
